@@ -16,6 +16,43 @@ function loadTranslations() {
 // Load translations when the script runs
 loadTranslations();
 
+
+document.addEventListener(
+  "keydown",
+  (event) => {
+    const keyName = event.key;
+
+    if (keyName === "ArrowRight") {
+      // do not alert when only Control key is pressed.
+      showRandomCard();
+      return;
+    }
+    if (keyName === "ArrowUp") {
+      // do not alert when only Control key is pressed.
+      document.querySelector('.card-inner').classList.toggle('flipped');
+      return;
+    }
+        if (keyName === "Enter") {
+      // do not alert when only Control key is pressed.
+const word = document.getElementById('wordInput').value.trim();
+    const translation = document.getElementById('translationInput').value.trim();
+    
+    // Check if both inputs are filled
+    if (word && translation) {
+        // Add the translation to the array
+        translations.push({ word, translation });
+        // Save to Local Storage
+        localStorage.setItem('translations', JSON.stringify(translations));
+        clearInputs();
+        document.getElementById('nextButton').style.display = 'block'; // Show "Next Word" button
+    }
+      return;
+    }
+  },
+  false,
+);
+
+
 // Add event listener to the "Add Translation" button
 document.getElementById('addButton').addEventListener('click', function() {
     const word = document.getElementById('wordInput').value.trim();
@@ -73,3 +110,32 @@ if (translations.length === 0) {
     document.getElementById('nextButton').style.display = 'block';
 }
 
+
+// Function to add multiple translations at once
+function addBulkTranslations(jsonString) {
+    try {
+        const newTranslations = JSON.parse(jsonString); // Parse the JSON string
+        if (Array.isArray(newTranslations)) {
+            // Merge with existing translations
+            translations = [...translations, ...newTranslations];
+            // Save to Local Storage
+            localStorage.setItem('translations', JSON.stringify(translations));
+            alert('Bulk translations added successfully!');
+        } else {
+            alert('Invalid JSON format. Please provide an array of {word, translation} objects.');
+        }
+    } catch (e) {
+        console.error("Error parsing bulk translations JSON:", e);
+        alert('Error parsing JSON. Please check the format.');
+    }
+}
+ 
+document.getElementById('bulkAddButton').addEventListener('click', function() {
+    const bulkInput = document.getElementById('bulkInput').value.trim();
+    if (bulkInput) {
+        document.getElementById("bulkInput").value="";
+        addBulkTranslations(bulkInput);
+    } else {
+        alert('Please enter a JSON string.');
+    }
+});
